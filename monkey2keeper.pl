@@ -38,6 +38,11 @@ while($row = $csv->getline(CSV)) {
   my @ccols = ();
   foreach my $key (sort {$a cmp $b} keys %hash) {
       push @ccols, $key, $hash{$key};
+      if($key eq "device_name" && $hash{$key} ne "") {
+        my $title = $hash{$key}." ".$fcols[1];
+        $title=~s/\"//g;
+        $fcols[1] = "\"$title\"";
+      }
   }
 
   printf("%s\n", join ",", @fcols, @ccols);
