@@ -1,4 +1,8 @@
 #!/usr/bin/env perl
+
+use strict;
+use warnings;
+
 use Text::CSV;
 
 @ARGV == 2 or die "error: <monkeybox_csv> <client_name>\n\n";
@@ -10,20 +14,22 @@ open(CSV, "<$ARGV[0]") or die "error: unable to read $ARGV[0]\n\n";
 
 my $csv = Text::CSV->new ({ binary => 1 });
 
-my $row = $csv->getline(CSV);
+my $row = $csv->getline(\*CSV);
 my @th = @$row;
 
-while($row = $csv->getline(CSV)) {
+while($row = $csv->getline(\*CSV)) {
 
   my @td = @$row;
 
-  $folder = $folder_root;
+  my $folder = $folder_root;
   my @search = grep { /^top secret$/ } @td;
   @search && do { $folder .= "__TOPSECRET"; };
 
   my %hash = ();
   my @fcols = ($folder,'','','','','','');
   for(my $i=0; $i < @th; $i++) {
+    $td[$i] =~ s/\r/<br>/g;
+    $td[$i] =~ s/\n/<br>/g;
     if($th[$i] =~ /^title$/i)                { $fcols[1] = "\"$td[$i]\""; }
     elsif($th[$i] =~ /^username_or_email$/i) { $fcols[2] = "\"$td[$i]\""; }
     elsif($th[$i] =~ /^password$/i)          { $fcols[3] = "\"$td[$i]\""; }
